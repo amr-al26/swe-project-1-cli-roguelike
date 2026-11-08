@@ -1,7 +1,7 @@
 import os
 
 menu_stages = {"start_menu": True, "new_game": False}
-game_stages = {"start": False}
+game_stages = {"start_message": False}
 
 STARTING_CLASSES = [
     {
@@ -128,7 +128,7 @@ def menu():
 
                 if choice == "Start":
                     menu_stages["new_game"] = False
-                    game_stages["start"] = True
+                    game_stages["start_message"] = True
                     running = False
 
                 os.system("clear")
@@ -137,9 +137,22 @@ def menu():
             break
 
 
+def print_new_game_message():
+    print("Welcome To The Beginning Of A New Journey Hero")
+    input("\nPress Enter to continue...")
+    print("You've Been Tasked With The Quest Of Slaying The Dragon")
+    input("\nPress Enter to continue...")
+    print("She Slumbers At The Other Side Of The Kingdom And Will Reek Havoc Upon Wake")
+    input("\nPress Enter to continue...")
+    print("You Will Face Countless Hardships On Your Journey But You Must Succeed")
+    input("\nPress Enter to continue...")
+    print("Farewell And Good Luck")
+
+
 def game():
-    if game_stages["start"]:
-        input("\nPress Enter to start...")
+    if game_stages["start_message"]:
+        print_new_game_message()
+        game_stages["start_message"] = False
 
 
 def print_start_menu():

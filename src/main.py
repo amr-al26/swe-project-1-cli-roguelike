@@ -7,7 +7,7 @@ os.system("clear")
 def main():
     print("Welcome To My CLI Project")
     while True:
-        if not game_stages["start"]:
+        if not game_stages["start_message"]:
             menu()
         else:
             game()
