@@ -1,6 +1,6 @@
 import os
 
-stages = {"start_menu": True, "new_game": False}
+menu_stages = {"start_menu": True, "new_game": False}
 
 STARTING_CLASSES = [
     {
@@ -92,36 +92,39 @@ STARTING_MOVE_SET = [
 
 
 def menu():
-    if stages["start_menu"]:
-        running = True
-        while running:
-            print_start_menu()
+    while True:
+        if menu_stages["start_menu"]:
+            running = True
+            while running:
+                print_start_menu()
 
-            menu_choice = input("\nChoose an option (1-4): ").strip()
+                menu_choice = input("\nChoose an option (1-4): ").strip()
 
-            if menu_choice == "1":
-                print("No Current Save Available")
-            elif menu_choice == "2":
-                stages["start_menu"] = False
-                stages["new_game"] = True
-                running = False
-            elif menu_choice == "3":
-                pass
-            elif menu_choice == "4":
-                break
-            else:
-                menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+                if menu_choice == "1":
+                    print("No Current Save Available")
+                elif menu_choice == "2":
+                    menu_stages["start_menu"] = False
+                    menu_stages["new_game"] = True
+                    running = False
+                elif menu_choice == "3":
+                    pass
+                elif menu_choice == "4":
+                    return
+                else:
+                    menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
 
-            input("\nPress Enter to continue...")
-            os.system("clear")
+                input("\nPress Enter to continue...")
+                os.system("clear")
 
-    if stages["new_game"]:
-        running = True
-        while running:
-            new_game()
-
-            input("\nPress Enter to continue...")
-            os.system("clear")
+        if menu_stages["new_game"]:
+            running = True
+            while running:
+                choice = new_game()
+                if choice == "q":
+                    menu_stages["start_menu"] = True
+                    menu_stages["new_game"] = False
+                    running = False
+                os.system("clear")
 
 
 def print_start_menu():
@@ -171,6 +174,8 @@ def new_game():
                 print_stats(STARTING_CLASSES[int(choice) - 1])
                 input("\nPress Enter to continue...")
                 break
+            else:
+                return choice
         except ValueError, IndexError:
             choice = (
                 input("Choose a class to preview its stats (1-3, q to return): ")
