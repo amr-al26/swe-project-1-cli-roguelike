@@ -1,6 +1,7 @@
 import os
 
 menu_stages = {"start_menu": True, "new_game": False}
+game_stages = {"start": False}
 
 STARTING_CLASSES = [
     {
@@ -124,7 +125,21 @@ def menu():
                     menu_stages["start_menu"] = True
                     menu_stages["new_game"] = False
                     running = False
+
+                if choice == "Start":
+                    menu_stages["new_game"] = False
+                    game_stages["start"] = True
+                    running = False
+
                 os.system("clear")
+
+        if choice == "Start":
+            break
+
+
+def game():
+    if game_stages["start"]:
+        input("\nPress Enter to start...")
 
 
 def print_start_menu():
@@ -172,8 +187,11 @@ def new_game():
         try:
             if choice != "q":
                 print_stats(STARTING_CLASSES[int(choice) - 1])
-                input("\nPress Enter to continue...")
-                break
+                confirm = input("\nPress Enter to continue (q to return)")
+                if confirm == "q":
+                    break
+                else:
+                    return "Start"
             else:
                 return choice
         except ValueError, IndexError:
