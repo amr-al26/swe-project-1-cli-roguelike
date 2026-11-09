@@ -4,9 +4,10 @@ from itertools import zip_longest
 
 menu_stages = {"start_menu": True, "new_game": False}
 game_stages = {"start_message": False, "tutorial": False}
-
+round_stages = {"menu_selection": False}
 # ENEMIES
 GOBLIN = {
+    "name": "Goblin",
     "hp": 50,
     "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
     "phy_def": 10,
@@ -14,6 +15,7 @@ GOBLIN = {
     "art": art.GOBLIN,
 }
 SKELETON = {
+    "name": "Skeleton",
     "hp": 40,
     "attack": {"name": "bow shot", "dmg": 25, "type": "physical"},
     "phy_def": 5,
@@ -21,6 +23,7 @@ SKELETON = {
     "art": art.SKELETON,
 }
 ZOMBIE = {
+    "name": "Zombie",
     "hp": 75,
     "attack": {"name": "bite", "dmg": 30, "type": "physical"},
     "phy_def": 10,
@@ -28,6 +31,7 @@ ZOMBIE = {
     "art": art.ZOMBIE,
 }
 GHOST = {
+    "name": "Ghost",
     "hp": 100,
     "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
     "phy_def": 25,
@@ -35,6 +39,7 @@ GHOST = {
     "art": art.GHOST,
 }
 WITCH = {
+    "name": "Witch",
     "hp": 60,
     "attack": {"name": "curse", "dmg": 35, "type": "magic"},
     "phy_def": 10,
@@ -43,6 +48,7 @@ WITCH = {
 }
 # Bosses
 CENTAUR = {
+    "name": "Centaur",
     "hp": 200,
     "attack": {"name": "kick", "dmg": 25, "type": "physical"},
     "phy_def": 20,
@@ -50,6 +56,7 @@ CENTAUR = {
     "art": art.CENTAUR,
 }
 GRIM_REAPER = {
+    "name": "The Grim Reaper",
     "hp": 125,
     "attack": {"name": "soul harvest", "dmg": 35, "type": "magic"},
     "phy_def": 10,
@@ -57,6 +64,7 @@ GRIM_REAPER = {
     "art": art.GRIM_REAPER,
 }
 DRAGON = {
+    "name": "Dragon",
     "hp": 150,
     "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
     "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
@@ -69,7 +77,7 @@ DRAGON = {
 STARTING_CLASSES = [
     {
         "name": "Wizard",
-        "hp": 75,
+        "max_hp": 75,
         "phy_dmg": 5,
         "phy_def": 10,
         "magic_dmg": 18,
@@ -78,7 +86,7 @@ STARTING_CLASSES = [
     },
     {
         "name": "Magic Knight",
-        "hp": 80,
+        "max_hp": 80,
         "phy_dmg": 10,
         "phy_def": 12,
         "magic_dmg": 10,
@@ -87,7 +95,7 @@ STARTING_CLASSES = [
     },
     {
         "name": "Warrior",
-        "hp": 90,
+        "max_hp": 90,
         "phy_dmg": 16,
         "phy_def": 18,
         "magic_dmg": 5,
@@ -234,14 +242,28 @@ def menu():
 
 
 def print_new_game_message():
-    print("Welcome To The Beginning Of A New Journey Hero")
+    print("Welcome To The Beginning Of A New Journey")
     input("\nPress Enter to continue...")
+    os.system("clear")
+    print("Welcome To The Beginning Of A New Journey")
     print("You've Been Tasked With The Quest Of Slaying The Dragon")
     input("\nPress Enter to continue...")
+    os.system("clear")
+    print("Welcome To The Beginning Of A New Journey")
+    print("You've Been Tasked With The Quest Of Slaying The Dragon")
     print("She Slumbers At The Other Side Of The Kingdom And Will Reek Havoc Upon Wake")
     input("\nPress Enter to continue...")
+    os.system("clear")
+    print("Welcome To The Beginning Of A New Journey")
+    print("You've Been Tasked With The Quest Of Slaying The Dragon")
+    print("She Slumbers At The Other Side Of The Kingdom And Will Reek Havoc Upon Wake")
     print("You Will Face Countless Hardships On Your Journey But You Must Succeed")
     input("\nPress Enter to continue...")
+    os.system("clear")
+    print("Welcome To The Beginning Of A New Journey")
+    print("You've Been Tasked With The Quest Of Slaying The Dragon")
+    print("She Slumbers At The Other Side Of The Kingdom And Will Reek Havoc Upon Wake")
+    print("You Will Face Countless Hardships On Your Journey But You Must Succeed")
     print("Farewell And Good Luck")
 
 
@@ -251,15 +273,35 @@ def game():
         game_stages["start_message"] = False
 
 
-def game_menu():
-    print("1. Attack")
-    print("2. Defend")
-    print("3. Check")
-    print("4. Items")
-    menu_choice = input("\nChoose an option (1-4): ").strip()
+def game_interface(player, round):
+    print(
+        side_by_side(player["art"], *[enemies["art"] for enemies in round["enemies"]])
+    )
+    print("-----------------")
+    enemies_hp = ""
+    for enemies in round["enemies"]:
+        enemies_hp += f"{enemies['name']}: {enemies['hp']} HP"
+
+    while round_stages["menu_selection"]:
+        print(f"HP: {player['hp']}{' ' * 10}{enemies_hp}")
+        print("1. Attack")
+        print("2. Defend")
+        print("3. Check")
+        print("4. Items")
+        menu_choice = input("\nChoose an option (1-4): ").strip()
+        if menu_choice == "1":
+            pass
+        elif menu_choice == "2":
+            pass
+        elif menu_choice == "3":
+            pass
+        elif menu_choice == "4":
+            pass
+        else:
+            menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
 
 
-def side_by_side(*arts, gap=4):
+def side_by_side(*arts, gap=10):
     blocks = [a.splitlines() for a in arts]
     n = max(map(len, blocks))
     blocks = [[""] * (n - len(b)) + b for b in blocks]
@@ -267,12 +309,6 @@ def side_by_side(*arts, gap=4):
     return "\n".join(
         (" " * gap).join(line.ljust(w) for line, w in zip(row, widths)).rstrip()
         for row in zip(*blocks)
-    )
-
-
-def print_art(player, round):
-    return side_by_side(
-        player["art"], *[enemies["art"] for enemies in round["enemies"]]
     )
 
 
