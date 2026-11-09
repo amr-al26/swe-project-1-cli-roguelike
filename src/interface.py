@@ -1,65 +1,120 @@
 import os
 
 menu_stages = {"start_menu": True, "new_game": False}
-game_stages = {"start_message": False}
+game_stages = {"start_message": False, "tutorial": False}
+
+ENEMIES = [
+    {
+        "name": "goblin",
+        "hp": 50,
+        "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
+        "phy_def": 10,
+        "magic_def": 10,
+    },
+    {
+        "name": "skeleton",
+        "hp": 40,
+        "attack": {"name": "bow shot", "dmg": 25, "type": "physical"},
+        "phy_def": 5,
+        "magic_def": 10,
+    },
+    {
+        "name": "zombie",
+        "hp": 75,
+        "attack": {"name": "bite", "dmg": 30, "type": "physical"},
+        "phy_def": 10,
+        "magic_def": 5,
+    },
+    {
+        "name": "ghost",
+        "hp": 100,
+        "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
+        "phy_def": 25,
+        "magic_def": 10,
+    },
+    {
+        "name": "witch",
+        "hp": 60,
+        "attack": {"name": "curse", "dmg": 35, "type": "magic"},
+        "phy_def": 10,
+        "magic_def": 30,
+    },
+    # Bosses
+    {
+        "name": "giant",
+        "hp": 200,
+        "attack": {"name": "slam", "dmg": 25, "type": "physical"},
+        "phy_def": 20,
+        "magic_def": 5,
+    },
+    {
+        "name": "grim reaper",
+        "hp": 125,
+        "attack": {"name": "soul harvest", "dmg": 35, "type": "magic"},
+        "phy_def": 10,
+        "magic_def": 15,
+    },
+    {
+        "name": "dragon",
+        "hp": 150,
+        "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
+        "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
+        "phy_def": 25,
+        "magic_def": 25,
+    },
+]
 
 STARTING_CLASSES = [
     {
         "name": "Wizard",
-        "hp": 65,
-        "mana": 60,
-        "phy_dmg": 0.25,
-        "phy_def": 0.25,
-        "magic_dmg": 0.60,
-        "magic_def": 0.70,
-        "evasion": 0.20,
+        "hp": 70,
+        "phy_dmg": 5,
+        "phy_def": 10,
+        "magic_dmg": 16,
+        "magic_def": 18,
     },
     {
         "name": "Magic Knight",
         "hp": 75,
-        "mana": 45,
-        "phy_dmg": 0.45,
-        "phy_def": 0.45,
-        "magic_dmg": 0.50,
-        "magic_def": 0.60,
-        "evasion": 0.30,
+        "phy_dmg": 10,
+        "phy_def": 12,
+        "magic_dmg": 10,
+        "magic_def": 12,
     },
     {
         "name": "Warrior",
         "hp": 90,
-        "mana": 25,
-        "phy_dmg": 0.60,
-        "phy_def": 0.60,
-        "magic_dmg": 0.25,
-        "magic_def": 0.25,
-        "evasion": 0.40,
+        "phy_dmg": 16,
+        "phy_def": 18,
+        "magic_dmg": 5,
+        "magic_def": 10,
     },
 ]
 
 PHY_MOVES = [
     # Targets One
-    {"name": "Kick", "dmg": "low", "target": "single"},
-    {"name": "Headbutt", "dmg": "med", "target": "single"},
-    {"name": "Bow Shot", "dmg": "med", "target": "single"},
-    {"name": "Lunge", "dmg": "med", "target": "single"},
-    {"name": "Giant Slash", "dmg": "high", "target": "single"},
-    {"name": "Knockout", "dmg": "high", "target": "single"},
+    {"name": "Kick", "dmg": 20, "target": "single"},
+    {"name": "Headbutt", "dmg": 30, "target": "single"},
+    {"name": "Bow Shot", "dmg": 40, "target": "single"},
+    {"name": "Lunge", "dmg": 55, "target": "single"},
+    {"name": "Giant Slash", "dmg": 70, "target": "single"},
+    {"name": "Knockout", "dmg": 90, "target": "single"},
     # Targets All
-    {"name": "Rampage", "dmg": "low", "target": "all"},
-    {"name": "Rapid Slashes", "dmg": "med", "target": "all"},
+    {"name": "Rampage", "dmg": 35, "target": "all"},
+    {"name": "Rapid Slashes", "dmg": 55, "target": "all"},
 ]
 
 MAGIC_MOVES = [
     # Targets One
-    {"name": "Agi", "dmg": "low", "target": "single"},
-    {"name": "Bufu", "dmg": "low", "target": "single"},
-    {"name": "Zio", "dmg": "low", "target": "single"},
-    {"name": "Garu", "dmg": "low", "target": "single"},
-    {"name": "Psyo", "dmg": "med", "target": "single"},
-    {"name": "Freila", "dmg": "med", "target": "single"},
+    {"name": "Agi", "dmg": 20, "target": "single"},
+    {"name": "Bufu", "dmg": 30, "target": "single"},
+    {"name": "Zio", "dmg": 40, "target": "single"},
+    {"name": "Garu", "dmg": 55, "target": "single"},
+    {"name": "Psyo", "dmg": 70, "target": "single"},
+    {"name": "Freila", "dmg": 90, "target": "single"},
     # Targets All
-    {"name": "Maeiha", "dmg": "low", "target": "all"},
-    {"name": "Megido", "dmg": "med", "target": "all"},
+    {"name": "Maeiha", "dmg": 35, "target": "all"},
+    {"name": "Megido", "dmg": 55, "target": "all"},
 ]
 
 BUFFS = [
@@ -71,23 +126,23 @@ STARTING_MOVE_SET = [
     {
         "name": "Wizard",
         "move_1": PHY_MOVES[0],
-        "move_2": MAGIC_MOVES[0],
-        "move_3": MAGIC_MOVES[1],
-        "move_4": MAGIC_MOVES[6],
+        "move_2": MAGIC_MOVES[2],
+        "move_3": MAGIC_MOVES[6],
+        "move_4": None,
     },
     {
         "name": "Magic Knight",
         "move_1": PHY_MOVES[0],
-        "move_2": PHY_MOVES[1],
-        "move_3": MAGIC_MOVES[2],
-        "move_4": MAGIC_MOVES[4],
+        "move_2": PHY_MOVES[6],
+        "move_3": MAGIC_MOVES[0],
+        "move_4": None,
     },
     {
         "name": "Warrior",
-        "move_1": PHY_MOVES[0],
-        "move_2": PHY_MOVES[2],
-        "move_3": PHY_MOVES[4],
-        "move_4": PHY_MOVES[6],
+        "move_1": PHY_MOVES[2],
+        "move_2": PHY_MOVES[6],
+        "move_3": MAGIC_MOVES[0],
+        "move_4": None,
     },
 ]
 
@@ -110,7 +165,7 @@ def menu():
                 elif menu_choice == "3":
                     pass
                 elif menu_choice == "4":
-                    return
+                    return menu_choice
                 else:
                     menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
 
@@ -155,6 +210,19 @@ def game():
         game_stages["start_message"] = False
 
 
+def game_menu():
+    print("1. Attack")
+    print("2. Defend")
+    print("3. Check")
+    print("4. Items")
+    menu_choice = input("\nChoose an option (1-4): ").strip()
+
+
+def tutorial():
+    print("Welcome To The Tutorial!")
+    input("\nPress Enter to continue...")
+
+
 def print_start_menu():
     print("1. Continue Game")
     print("2. New Game")
@@ -175,12 +243,10 @@ def print_stats(c):
     os.system("clear")
     print(c["name"])
     print(f"HP: {c['hp']}")
-    print(f"Mana: {c['mana']}")
-    print(f"Physical Damage: {c['phy_dmg']}")
-    print(f"Physical Defense: {c['phy_def']}")
-    print(f"Magic Damage: {c['magic_dmg']}")
-    print(f"Magic Defense: {c['magic_def']}")
-    print(f"Evasion: {c['evasion']}")
+    print(f"Physical Damage: {c['phy_dmg']}/33")
+    print(f"Physical Defense: {c['phy_def']}/33")
+    print(f"Magic Damage: {c['magic_dmg']}/33")
+    print(f"Magic Defense: {c['magic_def']}/33")
 
 
 def new_game():

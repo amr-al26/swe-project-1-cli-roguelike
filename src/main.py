@@ -8,7 +8,9 @@ def main():
     print("Welcome To My CLI Project")
     while True:
         if not game_stages["start_message"]:
-            menu()
+            menu_choice = menu()
+            if menu_choice == "4":
+                break
         else:
             game()
 
