@@ -1,68 +1,70 @@
 import os
+import art
+from itertools import zip_longest
 
 menu_stages = {"start_menu": True, "new_game": False}
 game_stages = {"start_message": False, "tutorial": False}
 
-ENEMIES = [
-    {
-        "name": "goblin",
-        "hp": 50,
-        "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
-        "phy_def": 10,
-        "magic_def": 10,
-    },
-    {
-        "name": "skeleton",
-        "hp": 40,
-        "attack": {"name": "bow shot", "dmg": 25, "type": "physical"},
-        "phy_def": 5,
-        "magic_def": 10,
-    },
-    {
-        "name": "zombie",
-        "hp": 75,
-        "attack": {"name": "bite", "dmg": 30, "type": "physical"},
-        "phy_def": 10,
-        "magic_def": 5,
-    },
-    {
-        "name": "ghost",
-        "hp": 100,
-        "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
-        "phy_def": 25,
-        "magic_def": 10,
-    },
-    {
-        "name": "witch",
-        "hp": 60,
-        "attack": {"name": "curse", "dmg": 35, "type": "magic"},
-        "phy_def": 10,
-        "magic_def": 30,
-    },
-    # Bosses
-    {
-        "name": "centaur",
-        "hp": 200,
-        "attack": {"name": "kick", "dmg": 25, "type": "physical"},
-        "phy_def": 20,
-        "magic_def": 5,
-    },
-    {
-        "name": "grim reaper",
-        "hp": 125,
-        "attack": {"name": "soul harvest", "dmg": 35, "type": "magic"},
-        "phy_def": 10,
-        "magic_def": 15,
-    },
-    {
-        "name": "dragon",
-        "hp": 150,
-        "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
-        "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
-        "phy_def": 25,
-        "magic_def": 25,
-    },
-]
+# ENEMIES
+GOBLIN = {
+    "hp": 50,
+    "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
+    "phy_def": 10,
+    "magic_def": 10,
+    "art": art.GOBLIN,
+}
+SKELETON = {
+    "hp": 40,
+    "attack": {"name": "bow shot", "dmg": 25, "type": "physical"},
+    "phy_def": 5,
+    "magic_def": 10,
+    "art": art.SKELETON,
+}
+ZOMBIE = {
+    "hp": 75,
+    "attack": {"name": "bite", "dmg": 30, "type": "physical"},
+    "phy_def": 10,
+    "magic_def": 5,
+    "art": art.ZOMBIE,
+}
+GHOST = {
+    "hp": 100,
+    "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
+    "phy_def": 25,
+    "magic_def": 10,
+    "art": art.GHOST,
+}
+WITCH = {
+    "hp": 60,
+    "attack": {"name": "curse", "dmg": 35, "type": "magic"},
+    "phy_def": 10,
+    "magic_def": 30,
+    "art": art.WITCH,
+}
+# Bosses
+CENTAUR = {
+    "hp": 200,
+    "attack": {"name": "kick", "dmg": 25, "type": "physical"},
+    "phy_def": 20,
+    "magic_def": 5,
+    "art": art.CENTAUR,
+}
+GRIM_REAPER = {
+    "hp": 125,
+    "attack": {"name": "soul harvest", "dmg": 35, "type": "magic"},
+    "phy_def": 10,
+    "magic_def": 15,
+    "art": art.GRIM_REAPER,
+}
+DRAGON = {
+    "hp": 150,
+    "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
+    "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
+    "phy_def": 25,
+    "magic_def": 25,
+    "art": art.DRAGON,
+}
+
 
 STARTING_CLASSES = [
     {
@@ -72,6 +74,7 @@ STARTING_CLASSES = [
         "phy_def": 10,
         "magic_dmg": 18,
         "magic_def": 18,
+        "art": art.WIZARD,
     },
     {
         "name": "Magic Knight",
@@ -80,6 +83,7 @@ STARTING_CLASSES = [
         "phy_def": 12,
         "magic_dmg": 10,
         "magic_def": 12,
+        "art": art.KNIGHT,
     },
     {
         "name": "Warrior",
@@ -88,6 +92,7 @@ STARTING_CLASSES = [
         "phy_def": 18,
         "magic_dmg": 5,
         "magic_def": 10,
+        "art": art.WARRIOR,
     },
 ]
 
@@ -145,6 +150,42 @@ STARTING_MOVE_SET = [
         "move_4": None,
     },
 ]
+
+ROUNDS = [
+    {"enemies": [dict(GOBLIN)], "rewards": {"points": 3, "items": "health_potion"}},
+    {
+        "enemies": [dict(SKELETON), dict(SKELETON)],
+        "rewards": {"points": 3, "items": "health_potion"},
+    },
+    {
+        "enemies": [dict(GOBLIN), dict(ZOMBIE), dict(ZOMBIE)],
+        "rewards": {"points": 5, "items": "health_potion"},
+    },
+    {"enemies": [dict(CENTAUR)], "rewards": {"points": 10, "items": "health_potion"}},
+    {
+        "enemies": [dict(GHOST), dict(GHOST), dict(GHOST)],
+        "rewards": {"points": 5, "items": "health_potion"},
+    },
+    {
+        "enemies": [dict(WITCH), dict(WITCH)],
+        "rewards": {"points": 3, "items": "health_potion"},
+    },
+    {
+        "enemies": [dict(GRIM_REAPER)],
+        "rewards": {"points": 8, "items": "health_potion"},
+    },
+    {
+        "enemies": [dict(SKELETON), dict(SKELETON), dict(ZOMBIE), dict(ZOMBIE)],
+        "rewards": {"points": 5, "items": "health_potion"},
+    },
+    {
+        "enemies": [dict(CENTAUR), dict(ZOMBIE), dict(GOBLIN)],
+        "rewards": {"points": 8, "items": "health_potion"},
+    },
+    {"enemies": [dict(DRAGON)]},
+]
+
+current_round = ROUNDS[0]
 
 
 def menu():
@@ -218,6 +259,23 @@ def game_menu():
     menu_choice = input("\nChoose an option (1-4): ").strip()
 
 
+def side_by_side(*arts, gap=4):
+    blocks = [a.splitlines() for a in arts]
+    n = max(map(len, blocks))
+    blocks = [[""] * (n - len(b)) + b for b in blocks]
+    widths = [max(map(len, b)) for b in blocks]
+    return "\n".join(
+        (" " * gap).join(line.ljust(w) for line, w in zip(row, widths)).rstrip()
+        for row in zip(*blocks)
+    )
+
+
+def print_art(player, round):
+    return side_by_side(
+        player["art"], *[enemies["art"] for enemies in round["enemies"]]
+    )
+
+
 def tutorial():
     print("Welcome To The Tutorial!")
     input("\nPress Enter to continue...")
@@ -242,6 +300,9 @@ def ask_for_start_menu_choice():
 def print_stats(c):
     os.system("clear")
     print(c["name"])
+    print("-------------------")
+    print(c["art"])
+    print("-------------------")
     print(f"HP: {c['hp']}")
     print(f"Physical Damage: {c['phy_dmg']}/33")
     print(f"Physical Defense: {c['phy_def']}/33")
