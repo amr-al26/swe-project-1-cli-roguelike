@@ -41,9 +41,9 @@ ENEMIES = [
     },
     # Bosses
     {
-        "name": "giant",
+        "name": "centaur",
         "hp": 200,
-        "attack": {"name": "slam", "dmg": 25, "type": "physical"},
+        "attack": {"name": "kick", "dmg": 25, "type": "physical"},
         "phy_def": 20,
         "magic_def": 5,
     },
@@ -67,15 +67,15 @@ ENEMIES = [
 STARTING_CLASSES = [
     {
         "name": "Wizard",
-        "hp": 70,
+        "hp": 75,
         "phy_dmg": 5,
         "phy_def": 10,
-        "magic_dmg": 16,
+        "magic_dmg": 18,
         "magic_def": 18,
     },
     {
         "name": "Magic Knight",
-        "hp": 75,
+        "hp": 80,
         "phy_dmg": 10,
         "phy_def": 12,
         "magic_dmg": 10,
