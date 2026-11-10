@@ -1,10 +1,13 @@
 import os
 import art
+from calculations import attack, enemy_attack, healing
+from data import PHY_MOVES, MAGIC_MOVES
 from itertools import zip_longest
 
 menu_stages = {"start_menu": True, "new_game": False}
 game_stages = {"start_message": False, "tutorial": False}
-round_stages = {"menu_selection": False}
+round_stages = {"menu_selection": False, "action_summary": False, "enemies_turn": False}
+
 # ENEMIES
 GOBLIN = {
     "name": "Goblin",
@@ -73,90 +76,69 @@ DRAGON = {
     "art": art.DRAGON,
 }
 
+STARTING_MOVE_SET = [
+    {
+        "name": "Wizard",
+        "move_1": PHY_MOVES[0],
+        "move_2": MAGIC_MOVES[0],
+        "move_3": MAGIC_MOVES[2],
+        "move_4": MAGIC_MOVES[6],
+    },
+    {
+        "name": "Magic Knight",
+        "move_1": PHY_MOVES[0],
+        "move_2": PHY_MOVES[6],
+        "move_3": MAGIC_MOVES[0],
+        "move_4": MAGIC_MOVES[1],
+    },
+    {
+        "name": "Warrior",
+        "move_1": PHY_MOVES[1],
+        "move_2": PHY_MOVES[2],
+        "move_3": PHY_MOVES[6],
+        "move_4": MAGIC_MOVES[0],
+    },
+]
 
 STARTING_CLASSES = [
     {
         "name": "Wizard",
+        "hp": 75,
         "max_hp": 75,
         "phy_dmg": 5,
         "phy_def": 10,
         "magic_dmg": 18,
         "magic_def": 18,
+        "move_set": STARTING_MOVE_SET[0],
         "art": art.WIZARD,
     },
     {
         "name": "Magic Knight",
+        "hp": 80,
         "max_hp": 80,
         "phy_dmg": 10,
         "phy_def": 12,
         "magic_dmg": 10,
         "magic_def": 12,
+        "move_set": STARTING_MOVE_SET[1],
         "art": art.KNIGHT,
     },
     {
         "name": "Warrior",
+        "hp": 90,
         "max_hp": 90,
         "phy_dmg": 16,
         "phy_def": 18,
         "magic_dmg": 5,
         "magic_def": 10,
+        "move_set": STARTING_MOVE_SET[2],
         "art": art.WARRIOR,
     },
 ]
 
-PHY_MOVES = [
-    # Targets One
-    {"name": "Kick", "dmg": 20, "target": "single"},
-    {"name": "Headbutt", "dmg": 30, "target": "single"},
-    {"name": "Bow Shot", "dmg": 40, "target": "single"},
-    {"name": "Lunge", "dmg": 55, "target": "single"},
-    {"name": "Giant Slash", "dmg": 70, "target": "single"},
-    {"name": "Knockout", "dmg": 90, "target": "single"},
-    # Targets All
-    {"name": "Rampage", "dmg": 35, "target": "all"},
-    {"name": "Rapid Slashes", "dmg": 55, "target": "all"},
-]
-
-MAGIC_MOVES = [
-    # Targets One
-    {"name": "Agi", "dmg": 20, "target": "single"},
-    {"name": "Bufu", "dmg": 30, "target": "single"},
-    {"name": "Zio", "dmg": 40, "target": "single"},
-    {"name": "Garu", "dmg": 55, "target": "single"},
-    {"name": "Psyo", "dmg": 70, "target": "single"},
-    {"name": "Freila", "dmg": 90, "target": "single"},
-    # Targets All
-    {"name": "Maeiha", "dmg": 35, "target": "all"},
-    {"name": "Megido", "dmg": 55, "target": "all"},
-]
-
-BUFFS = [
-    {"name": "Tarukaja", "effect": "increase phy dmg"},
-    {"name": "Makakaja", "effect": "increase magic dmg"},
-]
-
-STARTING_MOVE_SET = [
-    {
-        "name": "Wizard",
-        "move_1": PHY_MOVES[0],
-        "move_2": MAGIC_MOVES[2],
-        "move_3": MAGIC_MOVES[6],
-        "move_4": None,
-    },
-    {
-        "name": "Magic Knight",
-        "move_1": PHY_MOVES[0],
-        "move_2": PHY_MOVES[6],
-        "move_3": MAGIC_MOVES[0],
-        "move_4": None,
-    },
-    {
-        "name": "Warrior",
-        "move_1": PHY_MOVES[2],
-        "move_2": PHY_MOVES[6],
-        "move_3": MAGIC_MOVES[0],
-        "move_4": None,
-    },
+ITEMS = [
+    {"name": "Health Potion", "healing": 30, "lvl": 1},
+    {"name": "Health Potion", "healing": 50, "lvl": 2},
 ]
 
 ROUNDS = [
@@ -195,18 +177,22 @@ ROUNDS = [
 
 current_round = ROUNDS[0]
 
+player = {}
+
+inventory = [dict(ITEMS[0])]
+
 
 def menu():
     while True:
+        msg = ""
         if menu_stages["start_menu"]:
+            print_start_menu()
+            menu_choice = input("\nChoose an option (1-4): ").strip()
             running = True
             while running:
-                print_start_menu()
-
-                menu_choice = input("\nChoose an option (1-4): ").strip()
-
                 if menu_choice == "1":
                     print("No Current Save Available")
+                    running = False
                 elif menu_choice == "2":
                     menu_stages["start_menu"] = False
                     menu_stages["new_game"] = True
@@ -218,27 +204,25 @@ def menu():
                 else:
                     menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
 
-                input("\nPress Enter to continue...")
-                os.system("clear")
+            input("\nPress Enter to continue...")
+            os.system("clear")
 
         if menu_stages["new_game"]:
             running = True
             while running:
-                choice = new_game()
+                msg, choice = new_game()
                 if choice == "q":
                     menu_stages["start_menu"] = True
                     menu_stages["new_game"] = False
                     running = False
+                    os.system("clear")
 
-                if choice == "Start":
+                if msg == "Start":
                     menu_stages["new_game"] = False
                     game_stages["start_message"] = True
                     running = False
-
-                os.system("clear")
-
-        if choice == "Start":
-            break
+                    os.system("clear")
+                    return dict(STARTING_CLASSES[int(choice) - 1])
 
 
 def print_new_game_message():
@@ -265,15 +249,70 @@ def print_new_game_message():
     print("She Slumbers At The Other Side Of The Kingdom And Will Reek Havoc Upon Wake")
     print("You Will Face Countless Hardships On Your Journey But You Must Succeed")
     print("Farewell And Good Luck")
+    input("\nPress Enter to continue...")
 
 
-def game():
+def game(player):
     if game_stages["start_message"]:
         print_new_game_message()
+        os.system("clear")
         game_stages["start_message"] = False
+        round_stages["menu_selection"] = True
+
+    if round_stages["menu_selection"]:
+        game_interface(player, current_round)
 
 
-def game_interface(player, round):
+def move_selection(move_set):
+    print("-----------------")
+    print("Move Set")
+    print("-----------------")
+    print(
+        f"1. {move_set['move_1']['name']} Damage: {move_set['move_1']['dmg']} Target: {move_set['move_1']['target']}"
+    )
+    print(
+        f"2. {move_set['move_2']['name']} Damage: {move_set['move_2']['dmg']} Target: {move_set['move_2']['target']}"
+    )
+    print(
+        f"3. {move_set['move_3']['name']} Damage: {move_set['move_3']['dmg']} Target: {move_set['move_3']['target']}"
+    )
+    print(
+        f"4. {move_set['move_4']['name']} Damage: {move_set['move_4']['dmg']} Target: {move_set['move_4']['target']}"
+    )
+
+    move = input("\nChoose an option (1-4, q to return): ").strip().lower()
+
+    while True:
+        if move in "1234":
+            return move_set[f"move_{move}"]
+
+        if move == "q":
+            return "return"
+
+        move = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+
+
+def target_selection(round):
+    print("-----------------")
+    print("Opponent(s)")
+    print("-----------------")
+    index = 1
+    for enemy in round["enemies"]:
+        print(f"{index}. {enemy['name']}")
+        index += 1
+
+    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip().lower()
+    while True:
+        if choice == "q":
+            return "return"
+
+        if 0 < int(choice) <= (index - 1):
+            return round["enemies"][int(choice) - 2]
+
+        choice = input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip()
+
+
+def print_game_menu(player, round):
     print(
         side_by_side(player["art"], *[enemies["art"] for enemies in round["enemies"]])
     )
@@ -282,23 +321,120 @@ def game_interface(player, round):
     for enemies in round["enemies"]:
         enemies_hp += f"{enemies['name']}: {enemies['hp']} HP"
 
+    print(f"HP: {player['hp']}{' ' * 10}{enemies_hp}")
+    print("-----------------")
+
+
+def print_inventory(inventory):
+    print("-----------------")
+    print("Inventory")
+    print("-----------------")
+    index = 1
+    for item in inventory:
+        print(
+            f"{index}. {item['name']} (Level {item['lvl']}): Heals {item['healing']} HP"
+        )
+        index += 1
+
+    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip().lower()
+    while True:
+        if choice == "q":
+            return "return"
+        if 0 < int(choice) <= (index - 1):
+            return inventory[int(choice) - 2]
+
+        choice = (
+            input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip().lower()
+        )
+
+
+def print_enemies_stats(round):
+    for enemy in round["enemies"]:
+        print("-----------------")
+        print(enemy["name"])
+        print("-----------------")
+        print(f"Physical Defense: {enemy['phy_def']}")
+        print(f"Magic Defense: {enemy['magic_def']}")
+
+
+def game_interface(player, round):
     while round_stages["menu_selection"]:
-        print(f"HP: {player['hp']}{' ' * 10}{enemies_hp}")
+        defend = False
+        print_game_menu(player, round)
         print("1. Attack")
         print("2. Defend")
         print("3. Check")
         print("4. Items")
         menu_choice = input("\nChoose an option (1-4): ").strip()
+        running = True
+        while running:
+            if menu_choice == "1":
+                move = move_selection(player["move_set"])
+                if move == "return":
+                    break
+                target = target_selection(round)
+                if target == "return":
+                    break
+                dmg, status = attack(player, target, move)
+                running = False
+                round_stages["action_summary"] = True
+                round_stages["menu_selection"] = False
+            elif menu_choice == "2":
+                print("-----------------")
+                confirm = input("\nDefend(y/n)?: ").strip().lower()
+                while True:
+                    if confirm == "y":
+                        defend = True
+                        running = False
+                        round_stages["action_summary"] = True
+                        round_stages["menu_selection"] = False
+                        break
+                    elif confirm == "n":
+                        running = False
+                        break
+                    else:
+                        confirm = (
+                            input("\nPlease Enter A Valid Choice(y/n): ")
+                            .strip()
+                            .lower()
+                        )
+
+            elif menu_choice == "3":
+                print_enemies_stats(round)
+                running = False
+            elif menu_choice == "4":
+                item = print_inventory(inventory)
+                if item == "return":
+                    break
+                health_gained = healing(player, item)
+                running = False
+                round_stages["action_summary"] = True
+                round_stages["menu_selection"] = False
+            else:
+                menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+
+        input("\nPress Enter To Continue...")
+        os.system("clear")
+
+    while round_stages["action_summary"]:
+        print_game_menu(player, round)
         if menu_choice == "1":
-            pass
+            print(f"{move['name']} dealt {dmg} damage to {target['name']}!")
         elif menu_choice == "2":
-            pass
-        elif menu_choice == "3":
-            pass
+            print("You brace for an attack!")
         elif menu_choice == "4":
-            pass
-        else:
-            menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+            print(
+                f"Health Potion (Level {item['lvl']}) healed you for {health_gained} HP!"
+            )
+
+        input("\nPress Enter to continue...")
+        os.system("clear")
+
+        round_stages["action_summary"] = False
+        round_stages["enemies_turn"] = True
+
+    while round_stages["enemies_turn"]:
+        pass
 
 
 def side_by_side(*arts, gap=10):
@@ -339,7 +475,7 @@ def print_stats(c):
     print("-------------------")
     print(c["art"])
     print("-------------------")
-    print(f"HP: {c['hp']}")
+    print(f"HP: {c['max_hp']}")
     print(f"Physical Damage: {c['phy_dmg']}/33")
     print(f"Physical Defense: {c['phy_def']}/33")
     print(f"Magic Damage: {c['magic_dmg']}/33")
@@ -365,14 +501,14 @@ def new_game():
                 print_stats(STARTING_CLASSES[int(choice) - 1])
                 confirm = input("\nPress Enter to continue (q to return)")
                 if confirm == "q":
-                    break
+                    return "", choice
                 else:
-                    return "Start"
+                    return "Start", choice
             else:
-                return choice
+                return "", choice
         except ValueError, IndexError:
             choice = (
-                input("Choose a class to preview its stats (1-3, q to return): ")
+                input("Please Enter A Valid Choice (1-3, q to return): ")
                 .strip()
                 .lower()
             )
