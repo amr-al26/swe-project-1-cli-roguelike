@@ -6,7 +6,13 @@ from itertools import zip_longest
 
 menu_stages = {"start_menu": True, "new_game": False}
 game_stages = {"start_message": False, "tutorial": False}
-round_stages = {"menu_selection": False, "action_summary": False, "enemies_turn": False}
+round_stages = {
+    "round": False,
+    "menu_selection": False,
+    "action_summary": False,
+    "enemies_turn": False,
+    "upgrades": False,
+}
 
 # ENEMIES
 GOBLIN = {
@@ -142,7 +148,7 @@ ITEMS = [
 ]
 
 ROUNDS = [
-    {"enemies": [dict(GOBLIN)], "rewards": {"points": 3, "items": "health_potion"}},
+    {"enemies": [dict(GOBLIN)], "rewards": {"points": 3, "items": ITEMS[0]}},
     {
         "enemies": [dict(SKELETON), dict(SKELETON)],
         "rewards": {"points": 3, "items": "health_potion"},
@@ -220,6 +226,7 @@ def menu():
                 if msg == "Start":
                     menu_stages["new_game"] = False
                     game_stages["start_message"] = True
+                    round_stages["round"] = True
                     running = False
                     os.system("clear")
                     return dict(STARTING_CLASSES[int(choice) - 1])
@@ -259,7 +266,7 @@ def game(player):
         game_stages["start_message"] = False
         round_stages["menu_selection"] = True
 
-    if round_stages["menu_selection"]:
+    if round_stages["round"]:
         game_interface(player, current_round)
 
 
@@ -280,13 +287,22 @@ def move_selection(move_set):
         f"4. {move_set['move_4']['name']} Damage: {move_set['move_4']['dmg']} Target: {move_set['move_4']['target']}"
     )
 
-    move = input("\nChoose an option (1-4, q to return): ").strip().lower()
+    move = input("\nChoose an option (1-4, q to return): ").strip()
 
     while True:
-        if move in "1234":
-            return move_set[f"move_{move}"]
+        if move == "1":
+            return move_set["move_1"]
 
-        if move == "q":
+        if move == "1":
+            return move_set["move_2"]
+
+        if move == "1":
+            return move_set["move_3"]
+
+        if move == "1":
+            return move_set["move_4"]
+
+        if move.lower() == "q":
             return "return"
 
         move = input("\nPlease Enter A Valid Choice (1-4): ").strip()
@@ -301,13 +317,14 @@ def target_selection(round):
         print(f"{index}. {enemy['name']}")
         index += 1
 
-    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip().lower()
+    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip()
     while True:
-        if choice == "q":
-            return "return"
+        if choice.lower() == "q":
+            return "return", None
 
-        if 0 < int(choice) <= (index - 1):
-            return round["enemies"][int(choice) - 2]
+        if choice.isdigit():
+            if 0 < int(choice) <= (index - 1):
+                return round["enemies"][int(choice) - 2], int(choice) - 2
 
         choice = input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip()
 
@@ -319,7 +336,7 @@ def print_game_menu(player, round):
     print("-----------------")
     enemies_hp = ""
     for enemies in round["enemies"]:
-        enemies_hp += f"{enemies['name']}: {enemies['hp']} HP"
+        enemies_hp += f"{enemies['name']}: {enemies['hp']} HP "
 
     print(f"HP: {player['hp']}{' ' * 10}{enemies_hp}")
     print("-----------------")
@@ -336,16 +353,16 @@ def print_inventory(inventory):
         )
         index += 1
 
-    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip().lower()
+    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip()
     while True:
-        if choice == "q":
+        if choice.lower() == "q":
             return "return"
-        if 0 < int(choice) <= (index - 1):
-            return inventory[int(choice) - 2]
 
-        choice = (
-            input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip().lower()
-        )
+        if choice.isdigit():
+            if 0 < int(choice) <= (index - 1):
+                return inventory[int(choice) - 2]
+
+        choice = input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip()
 
 
 def print_enemies_stats(round):
@@ -355,6 +372,10 @@ def print_enemies_stats(round):
         print("-----------------")
         print(f"Physical Defense: {enemy['phy_def']}")
         print(f"Magic Defense: {enemy['magic_def']}")
+
+
+def check_for_round_end(round):
+    return len(round["enemies"]) == 0
 
 
 def game_interface(player, round):
@@ -372,7 +393,7 @@ def game_interface(player, round):
                 move = move_selection(player["move_set"])
                 if move == "return":
                     break
-                target = target_selection(round)
+                target, index = target_selection(round)
                 if target == "return":
                     break
                 dmg, status = attack(player, target, move)
@@ -420,6 +441,20 @@ def game_interface(player, round):
         print_game_menu(player, round)
         if menu_choice == "1":
             print(f"{move['name']} dealt {dmg} damage to {target['name']}!")
+            if status == "dead":
+                print(f"{target['name']} has fallen!")
+                round["enemies"].pop(index)
+                if check_for_round_end(round):
+                    print(
+                        f"You earned {round['rewards']['points']} points and a Level {round['rewards']['items']['lvl']} {round['rewards']['items']['name']}!"
+                    )
+                    inventory.append(dict(round["rewards"]["items"]))
+                    current_round = dict(ROUNDS[1])
+                    round_stages["action_summary"] = False
+                    round_stages["menu_selection"] = True
+                    input("\nPress Enter to continue...")
+                    os.system("clear")
+                    break
         elif menu_choice == "2":
             print("You brace for an attack!")
         elif menu_choice == "4":
@@ -434,7 +469,17 @@ def game_interface(player, round):
         round_stages["enemies_turn"] = True
 
     while round_stages["enemies_turn"]:
-        pass
+        print_game_menu(player, round)
+        for enemy in round["enemies"]:
+            dmg, move = enemy_attack(enemy, player, defend)
+            print(
+                f"{enemy['name']} uses {move['name']} ({move['type'].title()}) and does {dmg} dmg"
+            )
+            input("Press Enter To Continue...\n")
+
+        os.system("clear")
+        round_stages["enemies_turn"] = False
+        round_stages["menu_selection"] = True
 
 
 def side_by_side(*arts, gap=10):
