@@ -8,6 +8,7 @@ menu_stages = {"start_menu": True, "new_game": False}
 game_stages = {"start_message": False, "tutorial": False}
 round_stages = {
     "round": False,
+    "intro_message": False,
     "menu_selection": False,
     "action_summary": False,
     "enemies_turn": False,
@@ -19,8 +20,8 @@ GOBLIN = {
     "name": "Goblin",
     "hp": 50,
     "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
-    "phy_def": 10,
-    "magic_def": 10,
+    "phy_def": 8,
+    "magic_def": 8,
     "art": art.GOBLIN,
 }
 SKELETON = {
@@ -43,14 +44,14 @@ GHOST = {
     "name": "Ghost",
     "hp": 100,
     "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
-    "phy_def": 25,
+    "phy_def": 30,
     "magic_def": 10,
     "art": art.GHOST,
 }
 WITCH = {
     "name": "Witch",
-    "hp": 60,
-    "attack": {"name": "curse", "dmg": 35, "type": "magic"},
+    "hp": 90,
+    "attack": {"name": "curse", "dmg": 40, "type": "magic"},
     "phy_def": 10,
     "magic_def": 30,
     "art": art.WITCH,
@@ -61,15 +62,15 @@ CENTAUR = {
     "hp": 200,
     "attack": {"name": "kick", "dmg": 25, "type": "physical"},
     "phy_def": 20,
-    "magic_def": 5,
+    "magic_def": 10,
     "art": art.CENTAUR,
 }
 GRIM_REAPER = {
     "name": "The Grim Reaper",
     "hp": 125,
     "attack": {"name": "soul harvest", "dmg": 35, "type": "magic"},
-    "phy_def": 10,
-    "magic_def": 15,
+    "phy_def": 20,
+    "magic_def": 25,
     "art": art.GRIM_REAPER,
 }
 DRAGON = {
@@ -77,8 +78,8 @@ DRAGON = {
     "hp": 150,
     "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
     "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
-    "phy_def": 25,
-    "magic_def": 25,
+    "phy_def": 30,
+    "magic_def": 30,
     "art": art.DRAGON,
 }
 
@@ -148,43 +149,56 @@ ITEMS = [
 ]
 
 ROUNDS = [
-    {"enemies": [dict(GOBLIN)], "rewards": {"points": 3, "items": ITEMS[0]}},
     {
+        "index": 1,
+        "enemies": [dict(GOBLIN)],
+        "rewards": {"points": 3, "items": ITEMS[0]},
+    },
+    {
+        "index": 2,
         "enemies": [dict(SKELETON), dict(SKELETON)],
-        "rewards": {"points": 3, "items": "health_potion"},
+        "rewards": {"points": 3, "items": ITEMS[0]},
     },
     {
+        "index": 3,
         "enemies": [dict(GOBLIN), dict(ZOMBIE), dict(ZOMBIE)],
-        "rewards": {"points": 5, "items": "health_potion"},
+        "rewards": {"points": 5, "items": ITEMS[0]},
     },
-    {"enemies": [dict(CENTAUR)], "rewards": {"points": 10, "items": "health_potion"}},
     {
+        "index": 4,
+        "enemies": [dict(CENTAUR)],
+        "rewards": {"points": 10, "items": ITEMS[1]},
+    },
+    {
+        "index": 5,
         "enemies": [dict(GHOST), dict(GHOST), dict(GHOST)],
-        "rewards": {"points": 5, "items": "health_potion"},
+        "rewards": {"points": 5, "items": ITEMS[0]},
     },
     {
+        "index": 6,
         "enemies": [dict(WITCH), dict(WITCH)],
-        "rewards": {"points": 3, "items": "health_potion"},
+        "rewards": {"points": 3, "items": ITEMS[0]},
     },
     {
+        "index": 7,
         "enemies": [dict(GRIM_REAPER)],
-        "rewards": {"points": 8, "items": "health_potion"},
+        "rewards": {"points": 8, "items": ITEMS[1]},
     },
     {
+        "index": 8,
         "enemies": [dict(SKELETON), dict(SKELETON), dict(ZOMBIE), dict(ZOMBIE)],
-        "rewards": {"points": 5, "items": "health_potion"},
+        "rewards": {"points": 5, "items": ITEMS[1]},
     },
     {
+        "index": 9,
         "enemies": [dict(CENTAUR), dict(ZOMBIE), dict(GOBLIN)],
-        "rewards": {"points": 8, "items": "health_potion"},
+        "rewards": {"points": 8, "items": ITEMS[1]},
     },
-    {"enemies": [dict(DRAGON)]},
+    {"index": 10, "enemies": [dict(DRAGON)]},
 ]
 
-current_round = ROUNDS[0]
 
 player = {}
-
 inventory = [dict(ITEMS[0])]
 
 
@@ -259,7 +273,7 @@ def print_new_game_message():
     input("\nPress Enter to continue...")
 
 
-def game(player):
+def game(player, round):
     if game_stages["start_message"]:
         print_new_game_message()
         os.system("clear")
@@ -267,7 +281,7 @@ def game(player):
         round_stages["menu_selection"] = True
 
     if round_stages["round"]:
-        game_interface(player, current_round)
+        return game_interface(player, round)
 
 
 def move_selection(move_set):
@@ -275,16 +289,16 @@ def move_selection(move_set):
     print("Move Set")
     print("-----------------")
     print(
-        f"1. {move_set['move_1']['name']} Damage: {move_set['move_1']['dmg']} Target: {move_set['move_1']['target']}"
+        f"1. {move_set['move_1']['name']} Damage: {move_set['move_1']['dmg']} Type: {'Physical' if move_set['move_1'] in PHY_MOVES else 'Magic'} Target: {move_set['move_1']['target']}"
     )
     print(
-        f"2. {move_set['move_2']['name']} Damage: {move_set['move_2']['dmg']} Target: {move_set['move_2']['target']}"
+        f"2. {move_set['move_2']['name']} Damage: {move_set['move_2']['dmg']} Type: {'Physical' if move_set['move_2'] in PHY_MOVES else 'Magic'} Target: {move_set['move_2']['target']}"
     )
     print(
-        f"3. {move_set['move_3']['name']} Damage: {move_set['move_3']['dmg']} Target: {move_set['move_3']['target']}"
+        f"3. {move_set['move_3']['name']} Damage: {move_set['move_3']['dmg']} Type: {'Physical' if move_set['move_3'] in PHY_MOVES else 'Magic'} Target: {move_set['move_3']['target']}"
     )
     print(
-        f"4. {move_set['move_4']['name']} Damage: {move_set['move_4']['dmg']} Target: {move_set['move_4']['target']}"
+        f"4. {move_set['move_4']['name']} Damage: {move_set['move_4']['dmg']} Type: {'Physical' if move_set['move_4'] in PHY_MOVES else 'Magic'} Target: {move_set['move_4']['target']}"
     )
 
     move = input("\nChoose an option (1-4, q to return): ").strip()
@@ -293,13 +307,13 @@ def move_selection(move_set):
         if move == "1":
             return move_set["move_1"]
 
-        if move == "1":
+        if move == "2":
             return move_set["move_2"]
 
-        if move == "1":
+        if move == "3":
             return move_set["move_3"]
 
-        if move == "1":
+        if move == "4":
             return move_set["move_4"]
 
         if move.lower() == "q":
@@ -336,9 +350,9 @@ def print_game_menu(player, round):
     print("-----------------")
     enemies_hp = ""
     for enemies in round["enemies"]:
-        enemies_hp += f"{enemies['name']}: {enemies['hp']} HP "
+        enemies_hp += f"| {enemies['name']}: {enemies['hp']} HP "
 
-    print(f"HP: {player['hp']}{' ' * 10}{enemies_hp}")
+    print(f"HP: {player['hp']}/{player['max_hp']}{' ' * 7}{enemies_hp}")
     print("-----------------")
 
 
@@ -346,6 +360,9 @@ def print_inventory(inventory):
     print("-----------------")
     print("Inventory")
     print("-----------------")
+    if len(inventory) == 0:
+        print("Your Inventory Is Empty.")
+        return "return"
     index = 1
     for item in inventory:
         print(
@@ -374,11 +391,95 @@ def print_enemies_stats(round):
         print(f"Magic Defense: {enemy['magic_def']}")
 
 
+def upgrades(c, points):
+
+    while points > 0:
+        print(c["name"])
+        print("-------------------")
+        print(c["art"])
+        print("-------------------")
+        print(f"1. HP: {c['hp']}/{c['max_hp']}")
+        print(f"2. Physical Damage: {c['phy_dmg']}/33")
+        print(f"3. Physical Defense: {c['phy_def']}/33")
+        print(f"4. Magic Damage: {c['magic_dmg']}/33")
+        print(f"5. Magic Defense: {c['magic_def']}/33")
+
+        print(f"\n{points} Upgrade{'s' if points > 1 else ''} Remaining")
+        choice = input("\nChoose a stat to upgrade(1-5): ").strip()
+
+        while True:
+            if choice == "1":
+                c["hp"] += 5
+                c["max_hp"] += 5
+                points -= 1
+                break
+            elif choice == "2":
+                if c["phy_dmg"] == 33:
+                    print("This Stat Is Maxed Out")
+                    input("Press Enter To Continue...")
+                    break
+                c["phy_dmg"] += 1
+                points -= 1
+                break
+            elif choice == "3":
+                if c["phy_def"] == 33:
+                    print("This Stat Is Maxed Out")
+                    input("Press Enter To Continue...")
+                    break
+                c["phy_def"] += 1
+                points -= 1
+                break
+            elif choice == "4":
+                if c["magic_dmg"] == 33:
+                    print("This Stat Is Maxed Out")
+                    input("Press Enter To Continue...")
+                    break
+                c["magic_dmg"] += 1
+                points -= 1
+                break
+            elif choice == "5":
+                if c["magic_def"] == 33:
+                    print("This Stat Is Maxed Out")
+                    input("Press Enter To Continue...")
+                    break
+                c["magic_def"] += 1
+                points -= 1
+                break
+            else:
+                choice = input("\nPlease Enter A Valid Choice(1-5): ").strip()
+
+        os.system("clear")
+
+    print(c["name"])
+    print("-------------------")
+    print(c["art"])
+    print("-------------------")
+    print(f"1. HP: {c['hp']}/{c['max_hp']}")
+    print(f"2. Physical Damage: {c['phy_dmg']}/33")
+    print(f"3. Physical Defense: {c['phy_def']}/33")
+    print(f"4. Magic Damage: {c['magic_dmg']}/33")
+    print(f"5. Magic Defense: {c['magic_def']}/33")
+    input("\nPress Enter To Continue")
+    os.system("clear")
+
+
 def check_for_round_end(round):
     return len(round["enemies"]) == 0
 
 
 def game_interface(player, round):
+    while round_stages["intro_message"]:
+        print(
+            side_by_side(
+                player["art"], *[enemies["art"] for enemies in round["enemies"]]
+            )
+        )
+        print("-----------------")
+        print(f"HP: {player['hp']}/{player['max_hp']}")
+        print("-----------------")
+        print("A Horde Approaches")
+        input("\nPress Enter To Continue")
+
     while round_stages["menu_selection"]:
         defend = False
         print_game_menu(player, round)
@@ -396,7 +497,6 @@ def game_interface(player, round):
                 target, index = target_selection(round)
                 if target == "return":
                     break
-                dmg, status = attack(player, target, move)
                 running = False
                 round_stages["action_summary"] = True
                 round_stages["menu_selection"] = False
@@ -427,6 +527,7 @@ def game_interface(player, round):
                 item = print_inventory(inventory)
                 if item == "return":
                     break
+                inventory.pop(inventory.index(item))
                 health_gained = healing(player, item)
                 running = False
                 round_stages["action_summary"] = True
@@ -440,21 +541,32 @@ def game_interface(player, round):
     while round_stages["action_summary"]:
         print_game_menu(player, round)
         if menu_choice == "1":
-            print(f"{move['name']} dealt {dmg} damage to {target['name']}!")
-            if status == "dead":
-                print(f"{target['name']} has fallen!")
-                round["enemies"].pop(index)
-                if check_for_round_end(round):
-                    print(
-                        f"You earned {round['rewards']['points']} points and a Level {round['rewards']['items']['lvl']} {round['rewards']['items']['name']}!"
-                    )
-                    inventory.append(dict(round["rewards"]["items"]))
-                    current_round = dict(ROUNDS[1])
-                    round_stages["action_summary"] = False
-                    round_stages["menu_selection"] = True
-                    input("\nPress Enter to continue...")
-                    os.system("clear")
-                    break
+            if move["target"] == "all":
+                for enemy in round["enemies"][:]:
+                    dmg, status = attack(player, enemy, move)
+                    print(f"{move['name']} dealt {dmg} damage to {enemy['name']}!")
+                    if status == "dead":
+                        print(f"{enemy['name']} has fallen!")
+                        round["enemies"].remove(enemy)
+            else:
+                dmg, status = attack(player, target, move)
+                os.system("clear")
+                print_game_menu(player, round)
+                print(f"{move['name']} dealt {dmg} damage to {target['name']}!")
+                if status == "dead":
+                    print(f"{target['name']} has fallen!")
+                    round["enemies"].pop(index)
+
+            if check_for_round_end(round):
+                print(
+                    f"You earned {round['rewards']['points']} points and a Level {round['rewards']['items']['lvl']} {round['rewards']['items']['name']}!"
+                )
+                inventory.append(dict(round["rewards"]["items"]))
+                round_stages["action_summary"] = False
+                round_stages["upgrades"] = True
+                input("\nPress Enter to continue...")
+                os.system("clear")
+                return ROUNDS[round["index"]] if round["index"] != 10 else None
         elif menu_choice == "2":
             print("You brace for an attack!")
         elif menu_choice == "4":
@@ -480,6 +592,13 @@ def game_interface(player, round):
         os.system("clear")
         round_stages["enemies_turn"] = False
         round_stages["menu_selection"] = True
+
+    while round_stages["upgrades"]:
+        upgrades(player, ROUNDS[round["index"] - 2]["rewards"]["points"])
+        round_stages["upgrades"] = False
+        round_stages["menu_selection"] = True
+
+    return round
 
 
 def side_by_side(*arts, gap=10):
