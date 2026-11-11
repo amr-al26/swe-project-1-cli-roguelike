@@ -9,11 +9,11 @@ def main():
     print("Welcome To My CLI Project")
     while True:
         if not round_stages["round"]:
-            menu_choice = menu()
-            if menu_choice == "4":
+            player = menu()
+            if player == "4":
                 break
         else:
-            current_round = game(menu_choice, current_round)
+            current_round = game(player, current_round)
 
 
 if __name__ == "__main__":
