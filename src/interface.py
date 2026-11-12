@@ -164,7 +164,7 @@ def move_selection(move_set):
 
             return move_set[int(move) - 1]
         except ValueError, IndexError:
-            move = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+            move = input("\nPlease Enter A Valid Choice (1-4, q to return): ").strip()
 
 
 def target_selection(round):
@@ -185,7 +185,9 @@ def target_selection(round):
             if 0 < int(choice) <= index:
                 return round["enemies"][int(choice) - 1], int(choice) - 1
 
-        choice = input(f"\nPlease Enter A Valid Choice (1-{index}): ").strip()
+        choice = input(
+            f"\nPlease Enter A Valid Choice (1-{index}, q to return): "
+        ).strip()
 
 
 def print_game_menu(player, round):
@@ -224,7 +226,9 @@ def print_inventory(inventory):
             if 0 < int(choice) <= index:
                 return inventory[int(choice) - 1]
 
-        choice = input(f"\nPlease Enter A Valid Choice (1-{index}): ").strip()
+        choice = input(
+            f"\nPlease Enter A Valid Choice (1-{index}, q to return): "
+        ).strip()
 
 
 def print_enemies_stats(round):

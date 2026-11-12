@@ -125,8 +125,8 @@ GHOST = {
 }
 WITCH = {
     "name": "Witch",
-    "hp": 80,
-    "attack": {"name": "curse", "dmg": 30, "type": "magic"},
+    "hp": 70,
+    "attack": {"name": "curse", "dmg": 25, "type": "magic"},
     "phy_def": 10,
     "magic_def": 30,
     "art": art.WITCH,
