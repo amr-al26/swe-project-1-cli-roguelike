@@ -2,18 +2,23 @@ import random
 from data import PHY_MOVES, MAGIC_MOVES
 
 
+K = 50
+
+
 def attack(attacker, target, attack):
     if attack in PHY_MOVES:
-        dmg = int(attack["dmg"] * (attacker["phy_dmg"]) - (target["phy_def"]))
+        atk, df = attacker["phy_dmg"], target["phy_def"]
 
     if attack in MAGIC_MOVES:
-        dmg = int(attack["dmg"] * (attacker["magic_dmg"]) - (target["magic_def"]))
+        atk, df = attacker["magic_dmg"], target["magic_def"]
 
-    if target["hp"] - int(dmg) < 0:
+    dmg = int(attack["dmg"] * (1 + atk / K) * (K / (K + df)))
+
+    if target["hp"] - dmg < 0:
         target["hp"] = 0
         return dmg, "dead"
     else:
-        target["hp"] -= int(dmg)
+        target["hp"] -= dmg
 
     return dmg, "alive"
 
@@ -24,17 +29,16 @@ def enemy_attack(attacker, target, defend):
     else:
         move = attacker[f"attack{random.randint(1, 2)}"]
 
-    dmg = int(
-        move["dmg"] - target[f"{'phy' if move['type'] == 'physical' else 'magic'}_def"]
-    )
+    df = target[f"{'phy' if move['type'] == 'physical' else 'magic'}_def"]
+    dmg = int(move["dmg"] * (K / (K + df)))
 
     if defend:
         dmg //= 2
 
-    if target["hp"] - int(dmg) <= 0:
+    if target["hp"] - dmg <= 0:
         target["hp"] = 0
     else:
-        target["hp"] -= int(dmg)
+        target["hp"] -= dmg
 
     return dmg, move
 

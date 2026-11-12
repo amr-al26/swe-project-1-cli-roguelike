@@ -94,15 +94,15 @@ ITEMS = [
 GOBLIN = {
     "name": "Goblin",
     "hp": 50,
-    "attack": {"name": "swipe", "dmg": 25, "type": "physical"},
+    "attack": {"name": "swipe", "dmg": 10, "type": "physical"},
     "phy_def": 8,
     "magic_def": 8,
     "art": art.GOBLIN,
 }
 SKELETON = {
     "name": "Skeleton",
-    "hp": 40,
-    "attack": {"name": "bow shot", "dmg": 25, "type": "physical"},
+    "hp": 70,
+    "attack": {"name": "bow shot", "dmg": 15, "type": "physical"},
     "phy_def": 5,
     "magic_def": 10,
     "art": art.SKELETON,
@@ -110,23 +110,23 @@ SKELETON = {
 ZOMBIE = {
     "name": "Zombie",
     "hp": 75,
-    "attack": {"name": "bite", "dmg": 30, "type": "physical"},
+    "attack": {"name": "bite", "dmg": 20, "type": "physical"},
     "phy_def": 10,
     "magic_def": 5,
     "art": art.ZOMBIE,
 }
 GHOST = {
     "name": "Ghost",
-    "hp": 100,
-    "attack": {"name": "haunt", "dmg": 25, "type": "magic"},
+    "hp": 75,
+    "attack": {"name": "haunt", "dmg": 20, "type": "magic"},
     "phy_def": 30,
     "magic_def": 10,
     "art": art.GHOST,
 }
 WITCH = {
     "name": "Witch",
-    "hp": 90,
-    "attack": {"name": "curse", "dmg": 40, "type": "magic"},
+    "hp": 80,
+    "attack": {"name": "curse", "dmg": 30, "type": "magic"},
     "phy_def": 10,
     "magic_def": 30,
     "art": art.WITCH,
