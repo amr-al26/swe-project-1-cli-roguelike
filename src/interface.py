@@ -24,7 +24,7 @@ def menu():
         msg = ""
         if menu_stages["start_menu"]:
             print_start_menu()
-            menu_choice = input("\nChoose an option (1-4): ").strip()
+            menu_choice = input("\nChoose an option (1-3): ").strip()
             running = True
             while running:
                 if menu_choice == "1":
@@ -38,7 +38,7 @@ def menu():
                 elif menu_choice == "3":
                     return menu_choice
                 else:
-                    menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+                    menu_choice = input("\nPlease Enter A Valid Choice (1-3): ").strip()
 
             input("\nPress Enter to continue...")
             os.system("clear")
