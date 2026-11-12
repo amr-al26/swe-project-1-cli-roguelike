@@ -28,17 +28,14 @@ def menu():
             running = True
             while running:
                 if menu_choice == "1":
-                    print("No Current Save Available")
-                    running = False
-                elif menu_choice == "2":
                     menu_stages["start_menu"] = False
                     menu_stages["new_game"] = True
                     running = False
-                elif menu_choice == "3":
+                elif menu_choice == "2":
                     menu_stages["start_menu"] = False
                     menu_stages["records"] = True
                     running = False
-                elif menu_choice == "4":
+                elif menu_choice == "3":
                     return menu_choice
                 else:
                     menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
@@ -303,8 +300,41 @@ def upgrades(c, points):
     print(f"3. Physical Defense: {c['phy_def']}/33")
     print(f"4. Magic Damage: {c['magic_dmg']}/33")
     print(f"5. Magic Defense: {c['magic_def']}/33")
-    input("\nPress Enter To Continue")
-    os.system("clear")
+    input("\nPress Enter To Continue...\n")
+
+
+def move_addition(player, new_moves):
+    print("You Unlocked A New Move!")
+    print_move_set(player["move_set"])
+    print("-----------------")
+    print("New Moves")
+    for index, move in enumerate(new_moves):
+        print(
+            f"{index + 1}. {move['name']} Damage: {move['dmg']} Type: {'Physical' if move in PHY_MOVES else 'Magic'} Target: {move['target']}"
+        )
+
+    choice = input("Pick A Move (1-2, q to skip): ").strip()
+    while True:
+        if choice == "1" or choice == "2":
+            break
+
+        if choice.lower() == "q":
+            return
+
+        choice = input("Please Enter A Valid Choice (1-2, q to skip): ").strip()
+
+    if len(player["move_set"]) == 4:
+        replacement = input(
+            "You have the maximum amount of moves, select a move to replace (1-4): "
+        )
+        try:
+            player["move_set"][int(replacement) - 1] = new_moves[int(choice) - 1]
+        except ValueError, IndexError:
+            replacement = input("Please Enter A Valid Choice (1-4): ")
+    else:
+        player["move_set"].append(new_moves[int(choice) - 1])
+
+    input("\nPress Enter To Continue...")
 
 
 def check_for_round_end(round):
@@ -391,10 +421,12 @@ def game_interface(player, round):
             if move["target"] == "all":
                 for enemy in round["enemies"][:]:
                     dmg, status = attack(player, enemy, move)
-                    print(f"{move['name']} dealt {dmg} damage to {enemy['name']}!\n")
+                    print(f"{move['name']} dealt {dmg} damage to {enemy['name']}!")
                     if status == "dead":
                         print(f"{enemy['name']} has fallen!")
                         round["enemies"].remove(enemy)
+
+                    print()
             else:
                 dmg, status = attack(player, target, move)
                 os.system("clear")
@@ -468,8 +500,11 @@ def game_interface(player, round):
 
     while round_stages["upgrades"]:
         upgrades(player, ROUNDS[round["index"] - 2]["rewards"]["points"])
+        if "moves" in ROUNDS[round["index"] - 2]["rewards"]:
+            move_addition(player, ROUNDS[round["index"] - 2]["rewards"]["moves"])
         round_stages["upgrades"] = False
         round_stages["intro_message"] = True
+        os.system("clear")
 
     while round_stages["end_screen"]:
         print_run_data(player)
@@ -495,22 +530,16 @@ def side_by_side(*arts, gap=10):
     )
 
 
-def tutorial():
-    print("Welcome To The Tutorial!")
-    input("\nPress Enter to continue...")
-
-
 def print_start_menu():
-    print("1. Continue Game")
-    print("2. New Game")
-    print("3. Records")
-    print("4. Quit")
+    print("1. New Game")
+    print("2. Records")
+    print("3. Quit")
 
 
 def ask_for_start_menu_choice():
-    menu_choice = input("\nChoose an option (1-4): ").strip()
+    menu_choice = input("\nChoose an option (1-3): ").strip()
     while True:
-        if menu_choice not in "1234":
+        if menu_choice not in "123":
             menu_choice = input("\nPlease Enter A Valid Choice (1-4): ").strip()
         else:
             return menu_choice

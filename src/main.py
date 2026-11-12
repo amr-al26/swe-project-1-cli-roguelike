@@ -6,11 +6,11 @@ os.system("clear")
 
 def main():
     current_round = ROUNDS[0]
-    print("Welcome To My CLI Project")
+    print("Welcome To My CLI Project\n")
     while True:
         if not round_stages["round"]:
             player = menu()
-            if player == "4":
+            if player == "3":
                 break
         else:
             current_round = game(player, current_round)
