@@ -35,26 +35,14 @@ STARTING_MOVE_SET = [
     {
         "name": "Wizard",
         "moves": [PHY_MOVES[0], MAGIC_MOVES[1]],
-        "move_1": PHY_MOVES[0],
-        "move_2": MAGIC_MOVES[0],
-        "move_3": MAGIC_MOVES[2],
-        "move_4": MAGIC_MOVES[6],
     },
     {
         "name": "Magic Knight",
         "moves": [PHY_MOVES[0], MAGIC_MOVES[0]],
-        "move_1": PHY_MOVES[0],
-        "move_2": PHY_MOVES[6],
-        "move_3": MAGIC_MOVES[0],
-        "move_4": MAGIC_MOVES[1],
     },
     {
         "name": "Warrior",
         "moves": [PHY_MOVES[1], MAGIC_MOVES[0]],
-        "move_1": PHY_MOVES[1],
-        "move_2": PHY_MOVES[2],
-        "move_3": PHY_MOVES[6],
-        "move_4": MAGIC_MOVES[0],
     },
 ]
 
@@ -98,8 +86,8 @@ STARTING_CLASSES = [
 ]
 
 ITEMS = [
-    {"name": "Health Potion", "healing": 30, "lvl": 1},
-    {"name": "Health Potion", "healing": 50, "lvl": 2},
+    {"name": "Health Potion", "healing": 50, "lvl": 1},
+    {"name": "Health Potion", "healing": 100, "lvl": 2},
 ]
 
 # ENEMIES
@@ -162,7 +150,7 @@ GRIM_REAPER = {
 }
 DRAGON = {
     "name": "Dragon",
-    "hp": 150,
+    "hp": 250,
     "attack1": {"name": "fire breath", "dmg": 40, "type": "magic"},
     "attack2": {"name": "tail whip", "dmg": 40, "type": "physical"},
     "phy_def": 30,
@@ -174,12 +162,20 @@ ROUNDS = [
     {
         "index": 1,
         "enemies": [dict(GOBLIN), dict(GOBLIN)],
-        "rewards": {"points": 3, "items": ITEMS[0]},
+        "rewards": {
+            "points": 3,
+            "items": ITEMS[0],
+            "moves": [PHY_MOVES[2], MAGIC_MOVES[2]],
+        },
     },
     {
         "index": 2,
         "enemies": [dict(SKELETON), dict(SKELETON)],
-        "rewards": {"points": 3, "items": ITEMS[0]},
+        "rewards": {
+            "points": 3,
+            "items": ITEMS[0],
+            "moves": [PHY_MOVES[6], MAGIC_MOVES[6]],
+        },
     },
     {
         "index": 3,
@@ -189,7 +185,11 @@ ROUNDS = [
     {
         "index": 4,
         "enemies": [dict(CENTAUR)],
-        "rewards": {"points": 10, "items": ITEMS[1]},
+        "rewards": {
+            "points": 10,
+            "items": ITEMS[1],
+            "moves": [PHY_MOVES[3], MAGIC_MOVES[3]],
+        },
     },
     {
         "index": 5,
@@ -204,12 +204,20 @@ ROUNDS = [
     {
         "index": 7,
         "enemies": [dict(GRIM_REAPER)],
-        "rewards": {"points": 8, "items": ITEMS[1]},
+        "rewards": {
+            "points": 8,
+            "items": ITEMS[1],
+            "moves": [PHY_MOVES[7], MAGIC_MOVES[7]],
+        },
     },
     {
         "index": 8,
         "enemies": [dict(SKELETON), dict(SKELETON), dict(ZOMBIE), dict(ZOMBIE)],
-        "rewards": {"points": 5, "items": ITEMS[1]},
+        "rewards": {
+            "points": 5,
+            "items": ITEMS[1],
+            "moves": [PHY_MOVES[4], MAGIC_MOVES[4]],
+        },
     },
     {
         "index": 9,
