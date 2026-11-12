@@ -34,6 +34,7 @@ BUFFS = [
 STARTING_MOVE_SET = [
     {
         "name": "Wizard",
+        "moves": [PHY_MOVES[0], MAGIC_MOVES[1]],
         "move_1": PHY_MOVES[0],
         "move_2": MAGIC_MOVES[0],
         "move_3": MAGIC_MOVES[2],
@@ -41,6 +42,7 @@ STARTING_MOVE_SET = [
     },
     {
         "name": "Magic Knight",
+        "moves": [PHY_MOVES[0], MAGIC_MOVES[0]],
         "move_1": PHY_MOVES[0],
         "move_2": PHY_MOVES[6],
         "move_3": MAGIC_MOVES[0],
@@ -48,6 +50,7 @@ STARTING_MOVE_SET = [
     },
     {
         "name": "Warrior",
+        "moves": [PHY_MOVES[1], MAGIC_MOVES[0]],
         "move_1": PHY_MOVES[1],
         "move_2": PHY_MOVES[2],
         "move_3": PHY_MOVES[6],
@@ -64,7 +67,7 @@ STARTING_CLASSES = [
         "phy_def": 10,
         "magic_dmg": 18,
         "magic_def": 18,
-        "move_set": STARTING_MOVE_SET[0],
+        "move_set": STARTING_MOVE_SET[0]["moves"],
         "art": art.WIZARD,
         "dead": False,
     },
@@ -76,7 +79,7 @@ STARTING_CLASSES = [
         "phy_def": 12,
         "magic_dmg": 10,
         "magic_def": 12,
-        "move_set": STARTING_MOVE_SET[1],
+        "move_set": STARTING_MOVE_SET[1]["moves"],
         "art": art.KNIGHT,
         "dead": False,
     },
@@ -88,7 +91,7 @@ STARTING_CLASSES = [
         "phy_def": 18,
         "magic_dmg": 5,
         "magic_def": 10,
-        "move_set": STARTING_MOVE_SET[2],
+        "move_set": STARTING_MOVE_SET[2]["moves"],
         "art": art.WARRIOR,
         "dead": False,
     },

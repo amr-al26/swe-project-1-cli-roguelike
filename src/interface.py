@@ -90,6 +90,9 @@ def print_run_data(player):
     print(f"Physical Defense: {player['phy_def']}/33")
     print(f"Magic Damage: {player['magic_dmg']}/33")
     print(f"Magic Defense: {player['magic_def']}/33")
+
+    print_move_set(player["move_set"])
+
     print("------------------------------")
     print(f"Status: {player['status']}")
 
@@ -141,63 +144,51 @@ def game(player, round):
         return game_interface(player, round)
 
 
-def move_selection(move_set):
+def print_move_set(move_set):
     print("-----------------")
     print("Move Set")
     print("-----------------")
-    print(
-        f"1. {move_set['move_1']['name']} Damage: {move_set['move_1']['dmg']} Type: {'Physical' if move_set['move_1'] in PHY_MOVES else 'Magic'} Target: {move_set['move_1']['target']}"
-    )
-    print(
-        f"2. {move_set['move_2']['name']} Damage: {move_set['move_2']['dmg']} Type: {'Physical' if move_set['move_2'] in PHY_MOVES else 'Magic'} Target: {move_set['move_2']['target']}"
-    )
-    print(
-        f"3. {move_set['move_3']['name']} Damage: {move_set['move_3']['dmg']} Type: {'Physical' if move_set['move_3'] in PHY_MOVES else 'Magic'} Target: {move_set['move_3']['target']}"
-    )
-    print(
-        f"4. {move_set['move_4']['name']} Damage: {move_set['move_4']['dmg']} Type: {'Physical' if move_set['move_4'] in PHY_MOVES else 'Magic'} Target: {move_set['move_4']['target']}"
-    )
+    for index, move in enumerate(move_set):
+        print(
+            f"{index + 1}. {move['name']} Damage: {move['dmg']} Type: {'Physical' if move in PHY_MOVES else 'Magic'} Target: {move['target']}"
+        )
+
+
+def move_selection(move_set):
+
+    print_move_set(move_set)
 
     move = input("\nChoose an option (1-4, q to return): ").strip()
 
     while True:
-        if move == "1":
-            return move_set["move_1"]
+        try:
+            if move.lower() == "q":
+                return "return"
 
-        if move == "2":
-            return move_set["move_2"]
-
-        if move == "3":
-            return move_set["move_3"]
-
-        if move == "4":
-            return move_set["move_4"]
-
-        if move.lower() == "q":
-            return "return"
-
-        move = input("\nPlease Enter A Valid Choice (1-4): ").strip()
+            return move_set[int(move) - 1]
+        except ValueError, IndexError:
+            move = input("\nPlease Enter A Valid Choice (1-4): ").strip()
 
 
 def target_selection(round):
     print("-----------------")
     print("Opponent(s)")
     print("-----------------")
-    index = 1
+    index = 0
     for enemy in round["enemies"]:
-        print(f"{index}. {enemy['name']}")
+        print(f"{index + 1}. {enemy['name']}")
         index += 1
 
-    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip()
+    choice = input(f"\nChoose an option (1-{index}, q to return): ").strip()
     while True:
         if choice.lower() == "q":
             return "return", None
 
         if choice.isdigit():
-            if 0 < int(choice) <= (index - 1):
-                return round["enemies"][int(choice) - 2], int(choice) - 2
+            if 0 < int(choice) <= index:
+                return round["enemies"][int(choice) - 1], int(choice) - 1
 
-        choice = input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip()
+        choice = input(f"\nPlease Enter A Valid Choice (1-{index}): ").strip()
 
 
 def print_game_menu(player, round):
@@ -220,23 +211,23 @@ def print_inventory(inventory):
     if len(inventory) == 0:
         print("Your Inventory Is Empty.")
         return "return"
-    index = 1
+    index = 0
     for item in inventory:
         print(
-            f"{index}. {item['name']} (Level {item['lvl']}): Heals {item['healing']} HP"
+            f"{index + 1}. {item['name']} (Level {item['lvl']}): Heals {item['healing']} HP"
         )
         index += 1
 
-    choice = input(f"\nChoose an option (1-{index - 1}, q to return): ").strip()
+    choice = input(f"\nChoose an option (1-{index}, q to return): ").strip()
     while True:
         if choice.lower() == "q":
             return "return"
 
         if choice.isdigit():
-            if 0 < int(choice) <= (index - 1):
-                return inventory[int(choice) - 2]
+            if 0 < int(choice) <= index:
+                return inventory[int(choice) - 1]
 
-        choice = input(f"\nPlease Enter A Valid Choice (1-{index - 1}): ").strip()
+        choice = input(f"\nPlease Enter A Valid Choice (1-{index}): ").strip()
 
 
 def print_enemies_stats(round):
@@ -251,8 +242,6 @@ def print_enemies_stats(round):
 def upgrades(c, points):
 
     while points > 0:
-        print(c["class_name"])
-        print("-------------------")
         print(c["art"])
         print("-------------------")
         print(f"1. HP: {c['hp']}/{c['max_hp']}")
@@ -307,8 +296,6 @@ def upgrades(c, points):
 
         os.system("clear")
 
-    print(c["name"])
-    print("-------------------")
     print(c["art"])
     print("-------------------")
     print(f"1. HP: {c['hp']}/{c['max_hp']}")
@@ -436,7 +423,6 @@ def game_interface(player, round):
                 print("------------------------------")
                 round_stages["end_screen"] = True
                 round_stages["action_summary"] = False
-                runs.append(player)
                 break
 
         elif menu_choice == "2":
@@ -457,7 +443,7 @@ def game_interface(player, round):
         for enemy in round["enemies"]:
             dmg, move = enemy_attack(enemy, player, defend)
             print_game_menu(player, round)
-            enemy_attack_msg += f"{enemy['name']} uses {move['name']} ({move['type'].title()}) and does {dmg} dmg"
+            enemy_attack_msg += f"{enemy['name']} uses {move['name']} ({move['type'].title()}) and does {dmg} dmg\n"
             print(enemy_attack_msg)
 
             if player["hp"] == 0:
@@ -466,13 +452,14 @@ def game_interface(player, round):
                     f"Failed Run (Died At Round {round['index']} to {enemy['name']})"
                 )
                 print("\033[0;31mYOU DIED\033[0m")
-                input("Press Enter To Continue...\n")
+                input("Press Enter To View The Game Summary...\n")
+                os.system("clear")
                 round_stages["end_screen"] = True
                 break
 
             input("Press Enter To Continue...\n")
+            os.system("clear")
 
-        os.system("clear")
         if not round_stages["end_screen"]:
             round_stages["enemies_turn"] = False
             round_stages["menu_selection"] = True
@@ -540,6 +527,8 @@ def print_stats(player):
     print(f"Physical Defense: {player['phy_def']}/33")
     print(f"Magic Damage: {player['magic_dmg']}/33")
     print(f"Magic Defense: {player['magic_def']}/33")
+
+    print_move_set(player["move_set"])
 
 
 def new_game():

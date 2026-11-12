@@ -31,7 +31,7 @@ def enemy_attack(attacker, target, defend):
     if defend:
         dmg //= 2
 
-    if target["hp"] - int(dmg) < 0:
+    if target["hp"] - int(dmg) <= 0:
         target["hp"] = 0
     else:
         target["hp"] -= int(dmg)
