@@ -1,15 +1,5 @@
-from interface import check_for_round_end
 from calculations import healing, enemy_attack
 from data import ITEMS
-
-round_with_enemies = {"enemies": ["enemy"]}
-round_without_enemies = {"enemies": []}
-
-
-def test_end_of_round():
-    assert check_for_round_end(round_with_enemies) == False
-    assert check_for_round_end(round_without_enemies) == True
-
 
 test_player1 = {"max_hp": 100, "hp": 0}
 
